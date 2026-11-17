@@ -1,0 +1,4 @@
+set searchengine=http://127.0.0.1:8080/search?q=%s
+set startuppages+="http://192.168.1.16:7001"
+
+

@@ -1,0 +1,223 @@
+# Date: 2026-11-07
+# Info: $mod1 = alt
+
+# Other
+#exec --no-startup-id export XDG_SESSION_TYPE=x11
+#exec --no-startup-id export XDG_CURRENT_DESKTOP=i3
+#exec --no-startup-id dbus-update-activation-environment --systemd XDG_SESSION_TYPE XDG_CURRENT_DESKTOP
+exec --no-startup-id lxpolkit &
+# Set the Mod key to the Super/Windows key
+set $mod Mod4
+
+# Making every opened app floating mode
+# for_window [class=".*"] floating enable
+
+
+# Font for window titles. (Requires a Nerd Font installed for best results)
+font pango:monospace 10
+
+# Use Mouse+$mod to drag floating windows to their desired position
+floating_modifier $mod
+
+# -- Auto run's --
+
+# xprofile
+# Cursor speed
+# Logitech mouse
+#exec_always --no-startup-id xinput set-prop 7 "libinput Accel Profile Enabled" 0 1 0
+#exec_always --no-startup-id xinput set-prop 7  "libinput Accel Speed" -0.1
+
+# Lenovo ideapad 1 15IGL7 Touchpad
+# Cursor speed
+exec_always --no-startup-id xinput set-prop 9 "libinput Accel Profile Enabled" 0 1 0
+exec_always --no-startup-id xinput set-prop 9 "libinput Accel Speed" -0.5
+
+exec_always --no-startup-id xinput set-prop 7 "libinput Accel Profile Enabled" 0 1 0
+exec_always --no-startup-id xinput set-prop 7 "libinput Accel Speed" 0.5
+
+# Enabling tap-to-click
+exec_always --no-startup-id xinput set-prop 9 "libinput Tapping Enabled" 1
+
+# Input delay (Use 200 20/25/30/35/40 for 60 hz screens) 
+exec_always --no-startup-id xset r rate 200 20
+
+# Global cursor theme and size
+exec_always --no-startup-id export XCURSOR_THEME="Adwaita"
+exec_always --no-startup-id export XCURSOR_SIZE="16"
+exec_always --no-startup-id xsetroot -adwaita left_ptr
+
+exec_always --no-startup-id ~/dotfiles/x11/auto-sensivity/set_xinput_sensivity.sh
+
+# Auto lock when sleeping
+exec --no-startup-id xfce4-screensaver &
+# Autotiling
+exec_always --no-startup-id sleep 2; /home/emre/.local/bin/autotiling
+
+# Split in horizontal orientation
+#bindsym $mod+h split h
+
+# Split in vertical orientation
+#bindsym $mod+Shift+v split v
+
+# Picom
+exec_always --no-startup-id picom --config ~/.config/picom/picom.conf -b
+
+# Set wallpaper (Ensure you have image and 'feh' installed)
+exec_always --no-startup-id feh --bg-scale ~/dotfiles/wallpapers/5.jpg
+
+# Always merge Xresources
+#exec_always xrdb -merge ~/dotfiles/xresources/.Xresources
+
+# Launch Polybar on startup
+exec_always --no-startup-id pkill polybar; polybar mintbar &
+
+# .xprofile
+# exec_always --no-startup-id [ -f ~/.xprofile ] && . ~/.xprofile
+
+# --  Keybinds -- 
+
+# Start a terminal (Options: xfce4-terminal/gnome-termial, alacritty, other) 
+bindsym $mod+Return exec --no-startup-id xfce4-terminal
+bindsym $mod+t exec --no-startup-id alacritty
+
+# Kill focused window
+bindsym $mod+q kill
+
+# Start browser 
+bindsym $mod+b exec --no-startup-id  flatpak run io.gitlab.librewolf-community 
+
+# Start Rofi (Application Launcher in drun mode)
+bindsym $mod+d exec --no-startup-id rofi -show drun
+
+
+# -- Window management --
+
+# Move to scratchpad 
+bindsym $mod+Shift+minus move scratchpad
+
+# Show scratchpad
+bindsym $mod+minus scratchpad show
+
+# Change focus using vim keys (h, j, k, l) or arrow keys
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+
+# Move focused window
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
+
+# Switch to workspaces
+bindsym $mod+1 workspace 1
+bindsym $mod+2 workspace 2
+bindsym $mod+3 workspace 3
+bindsym $mod+4 workspace 4
+bindsym $mod+5 workspace 5
+
+# Move focused container to workspace
+bindsym $mod+Shift+1 move container to workspace 1
+bindsym $mod+Shift+2 move container to workspace 2
+bindsym $mod+Shift+3 move container to workspace 3
+bindsym $mod+Shift+4 move container to workspace 4
+bindsym $mod+Shift+5 move container to workspace 5
+
+# Resize mode configuration
+
+mode "resize" {
+        # These bindings trigger as soon as you enter the resize mode
+
+        # Pressing left/right will shrink/grow the window's width.
+        # Pressing up/down will shrink/grow the window's height.
+        bindsym h resize shrink width 10 px or 10 ppt
+        bindsym j resize grow height 10  px or 10 ppt
+        bindsym k resize shrink height 10 px or 10 ppt
+        bindsym l resize grow width 10 px or 10 ppt
+
+        # Same bindings, but using the arrow keys for convenience
+        bindsym Left resize shrink width 1 px or 1 ppt
+        bindsym Down resize grow height 1 px or 1 ppt
+        bindsym Up resize shrink height 1 px or 1 ppt
+        bindsym Right resize grow width 1 px or 1 ppt
+
+        # Back to normal: Enter or Escape
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+}
+
+# Bind Mod+r to enter the resize mode
+bindsym $mod+r mode "resize"
+
+
+# Toggle the focused window between tiling and floating mode
+bindsym $mod+z floating toggle
+
+
+# Toggle fullscreen
+bindsym $mod+f fullscreen toggle
+
+# Move the currently focused floating window with the mouse ($mod + left click)
+# (Note: floating_modifier is already set to $mod near the top of your config, 
+# but you can also use keyboard shortcuts to center floating windows)
+
+# Center the active floating window on the screen
+bindsym $mod+c focus mode_toggle
+
+# Make the current window sticky (visible across all workspaces)
+bindsym $mod+Shift+s sticky toggle
+
+
+# Reload the i3 configuration file in place
+bindsym $mod+Shift+c reload
+
+# Restart i3 inplace (preserves your layout/sessions)
+bindsym $mod+Shift+r restart
+
+# Exit i3 (logs you out of the session)
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3?' -B 'Yes, exit i3' 'i3-msg exit'"
+
+
+
+# Audio, brightness etc.
+# PulseAudio volume controls
+# bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +5%
+# bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -5%
+# bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle
+
+# --- AUDIO CONTROLS (PulseAudio / PipeWire) ---
+# F1 (Mute), F2 (Volume Down), F3 (Volume Up)
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -5%
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +5%
+
+# Microphone Mute (Often mapped near F4 on IdeaPads)
+bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle
+
+# --- MEDIA PLAYBACK CONTROLS (Playerctl) ---
+# Controls Spotify, VLC, MPV, Web browsers playing media, etc.
+bindsym XF86AudioPlay exec --no-startup-id playerctl play-pause
+bindsym XF86AudioPause exec --no-startup-id playerctl pause
+bindsym XF86AudioNext exec --no-startup-id playerctl next
+bindsym XF86AudioPrev exec --no-startup-id playerctl previous
+bindsym XF86AudioStop exec --no-startup-id playerctl stop
+
+# --- SCREEN BRIGHTNESS CONTROLS ---
+# Requires 'light' or 'brightnessctl' package installed on your system
+# F5 / F6 or F11 / F12 depending on your BIOS hotkey configuration
+bindsym XF86MonBrightnessDown exec --no-startup-id sudo brightnessctl set 5%-
+bindsym XF86MonBrightnessUp exec --no-startup-id sudo brightnessctl set +5%
+
+# Gaps
+gaps inner 4
+gaps outer 2
+smart_gaps on
+
+# Window borders (pixel-style thin borders)
+default_border pixel 2
+default_floating_border pixel 2
+hide_edge_borders smart
+
+
+

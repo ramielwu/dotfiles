@@ -1,0 +1,5 @@
+configuration {
+    drun-match-fields: "name";
+    drun-display-format: "{name}";
+}
+

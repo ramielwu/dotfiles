@@ -1,0 +1,141 @@
+# =============
+# NOTES & OTHER
+# =============
+# This section contains notes, extensive workarounds, and environmental setup:
+#
+# - XDG & Environment: The commented XDG exports help set up sessions properly 
+#   under X11 and systemd. Use 'lxpolkit' for authentication dialogs.
+# - Touchpad & Mouse: Uses 'xinput' to configure custom acceleration profiles,
+#   pointer speeds, and tap-to-click. Make sure input device IDs match your system.
+# - Rofi & Polybar: Application launcher (rofi) and status bar (polybar mintbar)
+#   run as background tasks on startup.
+# - Autotiling: Automatically switches window splits between horizontal and vertical.
+
+# =======================
+# ENVIRONMENT & AUTOSTART
+# =======================
+# Mod key configuration (Super/Windows key)
+set $mod Mod4
+
+# Core startup services and visual settings
+exec --no-startup-id lxpolkit &
+exec_always --no-startup-id sleep 2; /home/emre/.local/bin/autotiling
+exec_always --no-startup-id picom --config ~/.config/picom/picom.conf -b
+exec_always --no-startup-id feh --bg-scale ~/dotfiles/wallpapers/14.jpg
+exec_always --no-startup-id pkill polybar; polybar mintbar &
+exec_always --no-startup-id light-locker
+#exec --no-startup-id xss-lock --transfer-sleep-lock -- dm-tool lock
+
+# Input devices and cursor configuration
+exec_always --no-startup-id /bin/bash -c "source ~/dotfiles/x11/.xprofile"
+exec_always --no-startup-id xrdb -merge ~/dotfiles/x11/.Xresources
+
+# Touchpad
+exec_always --no-startup-id xinput set-prop "pointer:ELAN0645:00 04F3:31BE Touchpad" "libinput Accel Profile Enabled" 0 1 0
+exec_always --no-startup-id xinput set-prop "pointer:ELAN0645:00 04F3:31BE Touchpad" "libinput Accel Speed" 0.5
+exec_always --no-startup-id xinput set-prop "pointer:ELAN0645:00 04F3:31BE Touchpad" "libinput Tapping Enabled" 1
+
+# Logitech Wireless mouse
+exec_always --no-startup-id xinput set-prop "pointer:Logitech Wireless Mouse" "libinput Accel Profile Enabled" 0 1 0
+exec_always --no-startup-id xinput set-prop "pointer:Logitech Wireless Mouse" "libinput Accel Speed" -0.5
+
+exec_always --no-startup-id xset r rate 200 20
+#exec_always --no-startup-id export XCURSOR_THEME="Adwaita"
+#exec_always --no-startup-id export XCURSOR_SIZE="16"
+#exec_always --no-startup-id xsetroot -adwaita left_ptr
+#exec_always --no-startup-id ~/dotfiles/x11/auto-sensivity/set_xinput_sensivity.sh
+
+# Font and layout aesthetics
+font pango:monospace 10
+gaps inner 15
+gaps outer 0
+smart_gaps on
+default_border pixel 3
+default_floating_border pixel 2
+hide_edge_borders smart
+
+# Window border colors
+# class                 border  background text    indicator child_border
+client.focused          #FFFFFF #282A36    #FFFFFF #FFFFFF   #FFFFFF
+client.unfocused        #FFFF00 #222222    #888888 #222222   #FFFF00
+#client.focused_inactive #444444 #222222    #FFFFFF #444444   #444444
+
+# ===============================
+# KEYBINDINGS & WINDOW MANAGEMENT
+# ===============================
+# Application etc. and session controls
+bindsym $mod+Return exec --no-startup-id xfce4-terminal
+bindsym $mod+t exec --no-startup-id alacritty
+bindsym $mod+b exec --no-startup-id /home/emre/app/helium.AppImage
+bindsym $mod+n exec /home/emre/app/neovide.AppImage --neovim-bin /opt/nvim/bin/nvim
+bindsym $mod+d exec --no-startup-id rofi -show drun -drun-show-actions -no-drun-use-destkop-cache
+exec_always --no-startup-id export PATH="$PATH:$HOME/.cargo/bin"
+bindsym $mod+m exec --no-startup-id xmouseless &
+
+bindsym $mod+Shift+q kill
+bindsym $mod+Shift+c reload
+bindsym $mod+Shift+r restart
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3?' -B 'Yes, exit i3' 'i3-msg exit'"
+
+# Window focus and movement (Vim keys)
+floating_modifier $mod
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
+
+# Window states and layouts
+bindsym $mod+z floating toggle
+bindsym $mod+f fullscreen toggle
+bindsym $mod+c focus mode_toggle
+bindsym $mod+Shift+s sticky toggle
+bindsym $mod+Shift+minus move scratchpad
+bindsym $mod+minus scratchpad show
+
+# Workspaces (Switch and Move)
+bindsym $mod+1 workspace 1
+bindsym $mod+2 workspace 2
+bindsym $mod+3 workspace 3
+bindsym $mod+4 workspace 4
+bindsym $mod+5 workspace 5
+bindsym $mod+Shift+1 move container to workspace 1
+bindsym $mod+Shift+2 move container to workspace 2
+bindsym $mod+Shift+3 move container to workspace 3
+bindsym $mod+Shift+4 move container to workspace 4
+bindsym $mod+Shift+5 move container to workspace 5
+
+# Resize Mode
+mode "resize" {
+        bindsym h resize shrink width 10 px or 10 ppt
+        bindsym j resize grow height 10 px or 10 ppt
+        bindsym k resize shrink height 10 px or 10 ppt
+        bindsym l resize grow width 10 px or 10 ppt
+
+        bindsym Left resize shrink width 1 px or 1 ppt
+        bindsym Down resize grow height 1 px or 1 ppt
+        bindsym Up resize shrink height 1 px or 1 ppt
+        bindsym Right resize grow width 1 px or 1 ppt
+
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+}
+bindsym $mod+r mode "resize"
+
+# Hardware Media, Volume, and Brightness Keys
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -5%
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +5%
+bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle
+
+bindsym XF86AudioPlay exec --no-startup-id playerctl play-pause
+bindsym XF86AudioPause exec --no-startup-id playerctl pause
+bindsym XF86AudioNext exec --no-startup-id playerctl next
+bindsym XF86AudioPrev exec --no-startup-id playerctl previous
+bindsym XF86AudioStop exec --no-startup-id playerctl stop
+
+bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 5%-
+bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl set +5%

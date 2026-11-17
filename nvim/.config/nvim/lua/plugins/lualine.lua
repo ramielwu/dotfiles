@@ -1,0 +1,44 @@
+return {
+  "nvim-lualine/lualine.nvim",
+  dependencies = { "nvim-tree/nvim-web-devicons" },
+  config = function()
+    -- Custom helper function to check if the current file exists on disk
+    local function is_new_file()
+      local filepath = vim.fn.expand("%:p")
+      -- If the buffer has no name, it's unnamed
+      if filepath == "" then
+        return "[No Name]"
+      end
+      -- If the file does not exist on disk yet, show [NEW]
+      if vim.fn.filereadable(filepath) == 0 then
+        return vim.fn.expand("%:t") .. " [NEW]"
+      end
+      -- Otherwise, return the absolute file path (%:p)
+      return vim.fn.expand("%:p")
+    end
+
+    require("lualine").setup({
+      options = {
+        theme = "gruvbox",
+        component_separators = { left = "|", right = "|" },
+        section_separators = { left = "", right = "" },
+        globalstatus = true,
+      },
+      sections = {
+        lualine_a = { "mode" },
+        lualine_b = { "branch", "diff", "diagnostics" },
+        -- Replace standard filename component with our custom function
+        lualine_c = { is_new_file },
+        lualine_x = {
+          function()
+            return os.date("%Y-%m-%d %H:%M")
+          end,
+          "fileformat",
+          "filetype",
+        },
+        lualine_y = { "progress" },
+        lualine_z = { "location" },
+      },
+    })
+  end,
+}
